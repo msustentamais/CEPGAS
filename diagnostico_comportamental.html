@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Perfil Comportamental — CEPGAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-fundo:    #0D2B1A;
+    --verde-escuro:   #1B5E20;
+    --verde-med:      #2E7D32;
+    --verde-vivo:     #4CAF50;
+    --verde-claro:    #C8E6C9;
+    --ouro:           #C9A84C;
+    --ouro-claro:     #F5E6C8;
+    --terra:          #5D4037;
+    --areia:          #F9F3E8;
+    --branco:         #FAFAFA;
+    --texto:          #1A1A1A;
+    --texto-suave:    #555;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--verde-fundo);
+    color: var(--texto);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND PANTANEIRO ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(46,125,50,0.25) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(13,43,26,0.8) 0%, transparent 50%),
+      linear-gradient(170deg, #0D2B1A 0%, #1a3d26 40%, #0f2318 100%);
+    z-index: -1;
+  }
+
+  /* ── TELA INICIAL ── */
+  #tela-intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .selo {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--ouro);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.85;
+  }
+
+  .titulo-principal {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 600;
+    color: var(--branco);
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitulo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ouro-claro);
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+  }
+
+  .divisor-ouro {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+    margin: 0 auto 2.5rem;
+  }
+
+  .intro-texto {
+    max-width: 560px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 3rem;
+  }
+
+  .btn-iniciar {
+    background: linear-gradient(135deg, var(--verde-med), var(--verde-escuro));
+    color: #fff;
+    border: 1.5px solid var(--ouro);
+    border-radius: 50px;
+    padding: 1rem 3rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .btn-iniciar:hover {
+    background: linear-gradient(135deg, var(--verde-vivo), var(--verde-med));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(76,175,80,0.3);
+  }
+
+  /* ── TELA PERGUNTAS ── */
+  #tela-perguntas { display: none; min-height: 100vh; padding: 2rem 1.5rem 3rem; }
+
+  .progresso-wrap {
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .progresso-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .progresso-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progresso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde-vivo), var(--ouro));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .card-pergunta {
+    max-width: 640px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    backdrop-filter: blur(8px);
+    animation: entrar 0.4s ease;
+  }
+
+  @keyframes entrar {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .num-pergunta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--ouro);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .texto-pergunta {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    color: #fff;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  .opcoes { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .btn-opcao {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .btn-opcao:hover {
+    background: rgba(76,175,80,0.12);
+    border-color: var(--verde-vivo);
+    color: #fff;
+    transform: translateX(4px);
+  }
+
+  .btn-opcao.selecionado {
+    background: rgba(76,175,80,0.18);
+    border-color: var(--verde-vivo);
+    color: #fff;
+  }
+
+  .letra-opcao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--ouro);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  /* ── TELA RESULTADO ── */
+  #tela-resultado { display: none; min-height: 100vh; padding: 3rem 1.5rem; }
+
+  .resultado-wrap { max-width: 680px; margin: 0 auto; animation: entrar 0.6s ease; }
+
+  .badge-perfil {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--verde-med), var(--verde-escuro));
+    border: 1px solid var(--ouro);
+    border-radius: 50px;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ouro);
+    margin-bottom: 1.2rem;
+  }
+
+  .nome-perfil {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitulo-perfil {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ouro-claro);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.85;
+  }
+
+  .secao-resultado {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--verde-vivo);
+    border-radius: 0 16px 16px 0;
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .secao-titulo {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ouro);
+    margin-bottom: 0.75rem;
+  }
+
+  .secao-texto {
+    font-size: 0.93rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.82);
+  }
+
+  .secao-lista { list-style: none; }
+  .secao-lista li { padding: 0.3rem 0; color: rgba(255,255,255,0.82); font-size: 0.93rem; }
+  .secao-lista li::before { content: '→ '; color: var(--verde-vivo); font-weight: 700; }
+
+  .cha-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+
+  .cha-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .cha-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ouro);
+    margin-bottom: 0.6rem;
+  }
+
+  .cha-item ul { list-style: none; }
+  .cha-item li { font-size: 0.85rem; color: rgba(255,255,255,0.75); padding: 0.2rem 0; }
+  .cha-item li::before { content: '· '; color: var(--verde-vivo); }
+
+  .cepgas-box {
+    background: linear-gradient(135deg, rgba(46,125,50,0.2), rgba(13,43,26,0.4));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin: 2rem 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--ouro-claro);
+  }
+
+  .cta-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 2.5rem 0 1rem; }
+
+  .btn-whats {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 2.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+  }
+
+  .btn-whats:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,0.45); }
+
+  .btn-comprar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, var(--ouro), #a07830);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 2.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+  }
+  .btn-comprar:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.5); }
+
+  .btn-refazer {
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    padding: 0.7rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-refazer:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  .rodape {
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.25);
+    margin-top: 3rem;
+    padding-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 480px) {
+    .card-pergunta { padding: 1.75rem 1.25rem; }
+    .cha-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TELA 1 — INTRODUÇÃO
+══════════════════════════════════════════ -->
+<section id="tela-intro">
+  <p class="selo">CEPGAS · Liderança Sustentável</p>
+  <h1 class="titulo-principal">Diagnóstico de<br>Perfil Comportamental</h1>
+  <p class="subtitulo">Descubra seu estilo de liderar a sustentabilidade</p>
+  <div class="divisor-ouro"></div>
+  <p class="intro-texto">
+    Este diagnóstico identifica como você age naturalmente diante de situações de liderança. Não há respostas certas ou erradas — apenas o seu jeito autêntico de ser e de conduzir pessoas.<br><br>
+    Responda pensando em como você realmente age na maioria das situações. Leva cerca de <strong style="color:#fff">5 minutos</strong>.
+  </p>
+  <button class="btn-iniciar" onclick="iniciar()">Começar Diagnóstico</button>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TELA 2 — PERGUNTAS
+══════════════════════════════════════════ -->
+<section id="tela-perguntas">
+  <div class="progresso-wrap">
+    <div class="progresso-info">
+      <span id="label-progresso">Pergunta 1 de 15</span>
+      <span id="pct-progresso">0%</span>
+    </div>
+    <div class="progresso-bar"><div class="progresso-fill" id="barra"></div></div>
+  </div>
+  <div class="card-pergunta" id="card">
+    <p class="num-pergunta" id="num-perg"></p>
+    <p class="texto-pergunta" id="txt-perg"></p>
+    <div class="opcoes" id="opcoes"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TELA 3 — RESULTADO
+══════════════════════════════════════════ -->
+<section id="tela-resultado">
+  <div class="resultado-wrap">
+    <div class="badge-perfil">Seu Perfil CEPGAS</div>
+    <h2 class="nome-perfil" id="res-nome"></h2>
+    <p class="subtitulo-perfil" id="res-sub"></p>
+    <div class="divisor-ouro" style="margin:0 0 2rem"></div>
+
+    <div class="secao-resultado">
+      <p class="secao-titulo">✦ Seu Diferencial</p>
+      <p class="secao-texto" id="res-diferencial"></p>
+    </div>
+
+    <div class="secao-resultado">
+      <p class="secao-titulo">✦ Onde Você Demonstra Excelência</p>
+      <ul class="secao-lista" id="res-excelencia"></ul>
+    </div>
+
+    <div class="secao-resultado">
+      <p class="secao-titulo">✦ Como Você Fortalece a Sustentabilidade</p>
+      <p class="secao-texto" id="res-sustent"></p>
+    </div>
+
+    <div class="secao-resultado">
+      <p class="secao-titulo">✦ Seus Principais Desafios</p>
+      <ul class="secao-lista" id="res-desafios"></ul>
+    </div>
+
+    <div class="secao-resultado">
+      <p class="secao-titulo">✦ Competências a Desenvolver — Plano CHA</p>
+      <div class="cha-grid" id="res-cha"></div>
+    </div>
+
+    <div class="cepgas-box" id="res-cepgas"></div>
+
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1rem;">
+      <p style="font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ouro);margin-bottom:0.75rem;">Quer aprofundar esse desenvolvimento?</p>
+      <p style="font-size:0.92rem;color:rgba(255,255,255,0.75);line-height:1.7;margin-bottom:0;">O <strong style="color:#fff">CEPGAS</strong> é um programa de formação em Liderança Sustentável que une diagnóstico comportamental, competências ESG e desenvolvimento prático — para líderes que querem gerar impacto real com consciência e consistência.</p>
+    </div>
+
+    <div class="cta-wrap">
+      <a class="btn-comprar" href="https://pay.kiwify.com.br/bFlIE4j" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Quero fazer parte do CEPGAS
+      </a>
+      <a class="btn-whats" id="btn-zap" href="#" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Tirar dúvidas com Ferry
+      </a>
+      <button class="btn-refazer" onclick="reiniciar()">Refazer o diagnóstico</button>
+    </div>
+
+    <p class="rodape">CEPGAS · Liderança Sustentável por Evidência · © Fernanda de Arruda Machado</p>
+  </div>
+</section>
+
+<script>
+// ══════════════════════════════════════════
+// DADOS
+// ══════════════════════════════════════════
+const WHATSAPP_LINK = "https://wa.me/5565999055552?text=" + encodeURIComponent("Olá, Ferry! Acabei de fazer o Diagnóstico de Perfil Comportamental do CEPGAS. Gostaria de saber mais sobre o programa.");
+
+const perguntas = [
+  {
+    texto: "Quando conhece pessoas novas, normalmente você:",
+    opcoes: [
+      { letra: "A", texto: "Conversa com facilidade, faz amizades rapidamente e gosta de interagir." },
+      { letra: "B", texto: "Assume a iniciativa da conversa e conduz o assunto." },
+      { letra: "C", texto: "Observa primeiro antes de se envolver." },
+      { letra: "D", texto: "Aguarda o momento certo e conversa de forma tranquila." },
+    ]
+  },
+  {
+    texto: "Diante de um desafio inesperado, você costuma:",
+    opcoes: [
+      { letra: "A", texto: "Manter o entusiasmo e envolver outras pessoas." },
+      { letra: "B", texto: "Tomar decisões rapidamente e agir." },
+      { letra: "C", texto: "Analisar todas as possibilidades antes de decidir." },
+      { letra: "D", texto: "Manter a calma e buscar uma solução equilibrada." },
+    ]
+  },
+  {
+    texto: "Em um trabalho em equipe, você normalmente:",
+    opcoes: [
+      { letra: "A", texto: "Motiva as pessoas e cria um ambiente descontraído." },
+      { letra: "B", texto: "Organiza as ações para alcançar os resultados." },
+      { letra: "C", texto: "Garante que tudo seja feito corretamente." },
+      { letra: "D", texto: "Coopera e procura manter a harmonia do grupo." },
+    ]
+  },
+  {
+    texto: "Quando precisa tomar uma decisão importante:",
+    opcoes: [
+      { letra: "A", texto: "Considera o impacto sobre as pessoas." },
+      { letra: "B", texto: "Decide rapidamente." },
+      { letra: "C", texto: "Analisa informações e detalhes." },
+      { letra: "D", texto: "Escuta diferentes opiniões antes de decidir." },
+    ]
+  },
+  {
+    texto: "Ao iniciar um novo projeto, sua tendência é:",
+    opcoes: [
+      { letra: "A", texto: "Ficar animado com as possibilidades." },
+      { letra: "B", texto: "Definir objetivos e começar imediatamente." },
+      { letra: "C", texto: "Elaborar um planejamento detalhado." },
+      { letra: "D", texto: "Garantir que todos compreendam seus papéis." },
+    ]
+  },
+  {
+    texto: "Quando ocorre um conflito, você:",
+    opcoes: [
+      { letra: "A", texto: "Tenta aliviar a tensão conversando." },
+      { letra: "B", texto: "Enfrenta o problema diretamente." },
+      { letra: "C", texto: "Busca entender todas as causas." },
+      { letra: "D", texto: "Atua como conciliador." },
+    ]
+  },
+  {
+    texto: "Ao perceber desperdício de água, energia ou materiais em seu ambiente de trabalho, você:",
+    opcoes: [
+      { letra: "A", texto: "Incentiva as pessoas a mudarem seus hábitos." },
+      { letra: "B", texto: "Propõe ações imediatas para eliminar o desperdício." },
+      { letra: "C", texto: "Analisa as causas e sugere melhorias baseadas em dados." },
+      { letra: "D", texto: "Conversa com todos para construir soluções em conjunto." },
+    ]
+  },
+  {
+    texto: "Quando uma nova prática é proposta para reduzir impactos ambientais, você:",
+    opcoes: [
+      { letra: "A", texto: "Motiva as pessoas a participarem." },
+      { letra: "B", texto: "Organiza rapidamente sua implementação." },
+      { letra: "C", texto: "Avalia sua eficiência antes de adotá-la." },
+      { letra: "D", texto: "Procura garantir que todos compreendam e apoiem a mudança." },
+    ]
+  },
+  {
+    texto: "Um colega enfrenta dificuldades pessoais que estão afetando seu desempenho. Você:",
+    opcoes: [
+      { letra: "A", texto: "Procura animá-lo e oferecer apoio." },
+      { letra: "B", texto: "Ajuda a definir um plano para superar a situação." },
+      { letra: "C", texto: "Busca compreender os fatos antes de opinar." },
+      { letra: "D", texto: "Escuta com atenção e demonstra empatia." },
+    ]
+  },
+  {
+    texto: "Quando pessoas da equipe possuem opiniões muito diferentes, você:",
+    opcoes: [
+      { letra: "A", texto: "Incentiva o diálogo entre todos." },
+      { letra: "B", texto: "Conduz a equipe para chegar rapidamente a uma decisão." },
+      { letra: "C", texto: "Define critérios objetivos para avaliar as ideias." },
+      { letra: "D", texto: "Busca construir consenso e preservar o bom relacionamento." },
+    ]
+  },
+  {
+    texto: "Ao perceber que alguém está sendo tratado de forma injusta, você:",
+    opcoes: [
+      { letra: "A", texto: "Defende a pessoa imediatamente." },
+      { letra: "B", texto: "Age para corrigir a situação." },
+      { letra: "C", texto: "Procura entender todos os lados antes de agir." },
+      { letra: "D", texto: "Busca uma solução justa para todos os envolvidos." },
+    ]
+  },
+  {
+    texto: "Quando precisa tomar uma decisão que envolve responsabilidade e ética, você:",
+    opcoes: [
+      { letra: "A", texto: "Explica claramente os motivos da decisão." },
+      { letra: "B", texto: "Assume a responsabilidade e decide." },
+      { letra: "C", texto: "Confere normas, informações e possíveis riscos." },
+      { letra: "D", texto: "Garante que o processo seja transparente e participativo." },
+    ]
+  },
+  {
+    texto: "Ao identificar uma falha em um processo da organização, você:",
+    opcoes: [
+      { letra: "A", texto: "Compartilha ideias para melhorar." },
+      { letra: "B", texto: "Corrige imediatamente o problema." },
+      { letra: "C", texto: "Revisa procedimentos para evitar novas falhas." },
+      { letra: "D", texto: "Conversa com a equipe antes de implementar mudanças." },
+    ]
+  },
+  {
+    texto: "Quando recebe uma responsabilidade importante, você:",
+    opcoes: [
+      { letra: "A", texto: "Motiva todos os envolvidos." },
+      { letra: "B", texto: "Assume a liderança naturalmente." },
+      { letra: "C", texto: "Organiza cada etapa cuidadosamente." },
+      { letra: "D", texto: "Garante que todos trabalhem em colaboração." },
+    ]
+  },
+  {
+    texto: "Seu maior diferencial costuma ser:",
+    opcoes: [
+      { letra: "A", texto: "Inspirar pessoas." },
+      { letra: "B", texto: "Fazer acontecer." },
+      { letra: "C", texto: "Garantir qualidade." },
+      { letra: "D", texto: "Promover equilíbrio e cooperação." },
+    ]
+  },
+];
+
+const perfis = {
+  A: {
+    nome: "Comunicador",
+    subtitulo: "Predominância A — Influência & Mobilização",
+    diferencial: "Você possui facilidade para conectar pessoas, inspirar equipes e criar um ambiente de confiança. Sua comunicação, entusiasmo e capacidade de mobilização fazem com que as pessoas se sintam motivadas a participar de projetos e mudanças. Na perspectiva do CEPGAS, você é um agente natural de engajamento e transformação cultural.",
+    excelencia: ["Comunicação e relacionamento", "Motivação de equipes", "Criatividade para solucionar desafios", "Integração entre diferentes pessoas", "Mobilização para mudanças", "Construção de redes de colaboração"],
+    sustent: "Você consegue transformar conceitos em ações coletivas. Pessoas seguem líderes que inspiram, e essa é uma de suas maiores competências. Projetos ambientais, sociais e de governança tendem a ganhar força quando existe alguém capaz de envolver todos.",
+    desafios: ["Manter foco até a conclusão dos projetos", "Organizar prioridades", "Trabalhar com indicadores e métricas", "Desenvolver disciplina na execução", "Tomar decisões difíceis quando necessário"],
+    cha: {
+      Conhecimento: ["Gestão da sustentabilidade", "Planejamento estratégico", "Indicadores ESG", "Gestão de projetos"],
+      Habilidades: ["Organização", "Gestão do tempo", "Priorização", "Análise de resultados", "Comunicação estratégica"],
+      Atitudes: ["Constância", "Responsabilidade sobre entregas", "Disciplina", "Persistência"],
+    },
+    cepgas: "O CEPGAS ajudará você a transformar sua capacidade de inspirar pessoas em resultados concretos. Você aprenderá a estruturar processos, acompanhar indicadores e liderar mudanças sustentáveis com consistência. Sua missão é continuar sendo um inspirador — tornando-se também um gestor de resultados sustentáveis.",
+  },
+  B: {
+    nome: "Executor",
+    subtitulo: "Predominância B — Dominância & Resultados",
+    diferencial: "Você é movido pela ação e pela conquista de resultados. Possui capacidade natural de liderança, toma decisões com agilidade e conduz equipes em direção aos objetivos com determinação e foco. Na perspectiva do CEPGAS, você é um motor de mudança — capaz de transformar planejamento em realidade de forma rápida e eficiente.",
+    excelencia: ["Liderança e tomada de decisão", "Orientação para resultados e metas", "Capacidade de agir sob pressão", "Condução de mudanças e inovação", "Gestão de desafios complexos", "Protagonismo e iniciativa"],
+    sustent: "Você tem o poder de implementar práticas sustentáveis com rapidez e determinação. Onde outros hesitam, você age. Projetos de ESG precisam de líderes capazes de converter intenção em impacto real — e esse é exatamente o seu perfil em ação.",
+    desafios: ["Desenvolver escuta ativa e empatia com a equipe", "Valorizar processos participativos e colaborativos", "Considerar o impacto humano nas decisões rápidas", "Construir consenso sem perder a agilidade", "Equilibrar resultados de curto prazo com sustentabilidade de longo prazo"],
+    cha: {
+      Conhecimento: ["Liderança humanizada", "Governança e responsabilidade social", "Comunicação não violenta", "Gestão de pessoas e clima organizacional"],
+      Habilidades: ["Escuta ativa", "Construção de consenso", "Comunicação empática", "Gestão de conflitos", "Delegação eficaz"],
+      Atitudes: ["Abertura ao diálogo", "Paciência com processos", "Humildade para ouvir", "Valorização do coletivo"],
+    },
+    cepgas: "O CEPGAS ajudará você a ampliar seu impacto como líder, integrando à sua capacidade de execução as dimensões humanas e ambientais da sustentabilidade. Você aprenderá a construir resultados que respeitam pessoas, processos e o planeta. Sua missão é continuar fazendo acontecer — com mais consciência, colaboração e alcance.",
+  },
+  C: {
+    nome: "Analista",
+    subtitulo: "Predominância C — Conformidade & Qualidade",
+    diferencial: "Você possui uma mente analítica, rigorosa e comprometida com a qualidade. Antes de agir, examina os dados, avalia os riscos e estrutura soluções com profundidade. Na perspectiva do CEPGAS, você é um pilar de confiabilidade e governança — capaz de garantir que práticas sustentáveis sejam implementadas com consistência, precisão e transparência.",
+    excelencia: ["Análise criteriosa de dados e processos", "Garantia de qualidade e conformidade", "Planejamento detalhado e estruturado", "Identificação de riscos e falhas", "Gestão de indicadores ESG", "Construção de processos confiáveis e documentados"],
+    sustent: "Você é o guardião da consistência sustentável. Sua capacidade de analisar, medir e monitorar garante que os compromissos ESG não fiquem apenas no discurso — se tornem práticas verificáveis, com evidências e resultados mensuráveis. A governança de qualidade começa com líderes como você.",
+    desafios: ["Desenvolver agilidade na tomada de decisão", "Lidar com ambiguidade e incerteza", "Engajar pessoas de forma mais espontânea", "Flexibilizar processos quando necessário", "Comunicar análises de forma acessível e inspiradora"],
+    cha: {
+      Conhecimento: ["Liderança adaptativa", "Comunicação estratégica e acessível", "Gestão da mudança", "Engajamento e mobilização de equipes"],
+      Habilidades: ["Comunicação simplificada", "Tomada de decisão sob incerteza", "Flexibilidade metodológica", "Influência e persuasão", "Adaptação a contextos dinâmicos"],
+      Atitudes: ["Abertura ao risco calculado", "Tolerância à imperfeição", "Disposição para simplificar", "Confiança nas pessoas"],
+    },
+    cepgas: "O CEPGAS ajudará você a expandir sua liderança para além da análise, desenvolvendo a capacidade de mobilizar pessoas, comunicar com clareza e tomar decisões mesmo diante da incerteza. Você aprenderá a usar seu rigor analítico como alavanca para a transformação sustentável em toda a organização. Sua missão é continuar sendo o guardião da qualidade — tornando-se também um comunicador e líder de mudanças.",
+  },
+  D: {
+    nome: "Diplomata",
+    subtitulo: "Predominância D — Estabilidade & Cooperação",
+    diferencial: "Você é um líder que constrói pontes. Sua capacidade de ouvir, mediar e promover o equilíbrio cria ambientes de trabalho mais humanos, colaborativos e sustentáveis. Na perspectiva do CEPGAS, você é um agente de coesão — aquele que garante que as transformações aconteçam sem deixar ninguém para trás, fortalecendo o tecido social da organização.",
+    excelencia: ["Mediação de conflitos e construção de consenso", "Criação de ambientes colaborativos e seguros", "Escuta ativa e empatia", "Sustentação de relações de longo prazo", "Promoção de equidade e inclusão", "Estabilidade emocional em momentos de crise"],
+    sustent: "Você sustenta o pilar social da liderança ESG. Onde há tensão, você promove diálogo. Onde há exclusão, você promove pertencimento. Onde há pressa, você lembra que as pessoas precisam de tempo para mudar. Sua liderança é o alicerce humano de qualquer processo de transformação sustentável.",
+    desafios: ["Desenvolver protagonismo e iniciativa", "Tomar decisões com mais agilidade", "Conduzir mudanças mesmo sem consenso total", "Posicionar-se com firmeza diante de conflitos", "Estabelecer limites saudáveis sem comprometer as relações"],
+    cha: {
+      Conhecimento: ["Liderança transformacional", "Gestão de mudanças", "Tomada de decisão em ambientes complexos", "Estratégia e planejamento sustentável"],
+      Habilidades: ["Protagonismo", "Assertividade", "Condução de processos decisórios", "Gestão de conflitos com firmeza", "Comunicação direta e clara"],
+      Atitudes: ["Coragem para decidir", "Proatividade", "Disposição para liderar mudanças", "Autoconfiança"],
+    },
+    cepgas: "O CEPGAS ajudará você a ampliar sua liderança, desenvolvendo a capacidade de tomar iniciativas, conduzir mudanças e posicionar-se com clareza — sem perder a sua essência colaborativa e humana. Você aprenderá a unir a força do relacionamento com a coragem da ação. Sua missão é continuar sendo o elo que une — tornando-se também o líder que move.",
+  },
+};
+
+// ══════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════
+let atual = 0;
+let contagem = { A: 0, B: 0, C: 0, D: 0 };
+
+// ══════════════════════════════════════════
+// FUNÇÕES
+// ══════════════════════════════════════════
+function iniciar() {
+  atual = 0;
+  contagem = { A: 0, B: 0, C: 0, D: 0 };
+  document.getElementById('tela-intro').style.display = 'none';
+  document.getElementById('tela-perguntas').style.display = 'block';
+  renderPergunta();
+}
+
+function renderPergunta() {
+  const p = perguntas[atual];
+  const total = perguntas.length;
+  const pct = Math.round((atual / total) * 100);
+
+  document.getElementById('label-progresso').textContent = `Pergunta ${atual + 1} de ${total}`;
+  document.getElementById('pct-progresso').textContent = `${pct}%`;
+  document.getElementById('barra').style.width = `${pct}%`;
+  document.getElementById('num-perg').textContent = `Situação ${atual + 1}`;
+  document.getElementById('txt-perg').textContent = p.texto;
+
+  const wrap = document.getElementById('opcoes');
+  wrap.innerHTML = '';
+  p.opcoes.forEach(op => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-opcao';
+    btn.innerHTML = `<span class="letra-opcao">${op.letra}</span><span>${op.texto}</span>`;
+    btn.onclick = () => escolher(op.letra);
+    wrap.appendChild(btn);
+  });
+
+  // re-animar card
+  const card = document.getElementById('card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'entrar 0.4s ease';
+}
+
+function escolher(letra) {
+  contagem[letra]++;
+  atual++;
+  if (atual < perguntas.length) {
+    renderPergunta();
+  } else {
+    mostrarResultado();
+  }
+}
+
+function mostrarResultado() {
+  document.getElementById('tela-perguntas').style.display = 'none';
+  document.getElementById('tela-resultado').style.display = 'block';
+  window.scrollTo(0, 0);
+
+  // perfil predominante
+  const perfil = Object.entries(contagem).sort((a, b) => b[1] - a[1])[0][0];
+  const d = perfis[perfil];
+
+  document.getElementById('res-nome').textContent = `Perfil ${perfil} — ${d.nome}`;
+  document.getElementById('res-sub').textContent = d.subtitulo;
+  document.getElementById('res-diferencial').textContent = d.diferencial;
+  document.getElementById('res-sustent').textContent = d.sustent;
+  document.getElementById('res-cepgas').textContent = d.cepgas;
+
+  const exWrap = document.getElementById('res-excelencia');
+  exWrap.innerHTML = '';
+  d.excelencia.forEach(item => { const li = document.createElement('li'); li.textContent = item; exWrap.appendChild(li); });
+
+  const desWrap = document.getElementById('res-desafios');
+  desWrap.innerHTML = '';
+  d.desafios.forEach(item => { const li = document.createElement('li'); li.textContent = item; desWrap.appendChild(li); });
+
+  const chaWrap = document.getElementById('res-cha');
+  chaWrap.innerHTML = '';
+  Object.entries(d.cha).forEach(([cat, itens]) => {
+    const div = document.createElement('div');
+    div.className = 'cha-item';
+    div.innerHTML = `<p class="cha-label">${cat}</p><ul>${itens.map(i => `<li>${i}</li>`).join('')}</ul>`;
+    chaWrap.appendChild(div);
+  });
+
+  // botão WhatsApp
+  document.getElementById('btn-zap').href = WHATSAPP_LINK;
+}
+
+function reiniciar() {
+  document.getElementById('tela-resultado').style.display = 'none';
+  document.getElementById('tela-intro').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
