@@ -1,74 +1,332 @@
-// Cole este código no Apps Script da planilha "Controle_Leads_CEPGAS"
-// (depois de abri-la/convertê-la no Google Sheets).
-// Ele grava tanto o formulário de entrada quanto o resultado do diagnóstico
-// na mesma aba "Leads CEPGAS", usando o e-mail do lead para casar as duas informações.
-
-var ABA = "Leads CEPGAS";
-var LINHA_CABECALHO = 2;   // linha com os nomes das colunas (a linha 1 é o título dos grupos)
-var LINHA_INICIO_DADOS = 3;
-
-// Colunas (conforme o cabeçalho atual da planilha)
-var COL_NOME = 1;              // A - Nome do Lead
-var COL_EMPRESA = 2;           // B - Empresa
-var COL_CONTATO = 5;           // E - Contato
-var COL_PERFIL = 6;            // F - Perfil Comportamental
-var COL_DIMENSAO = 7;          // G - Dimensão Predominante
-var COL_DATA_DIAGNOSTICO = 8;  // H - Data do Diagnóstico
-var COL_ULTIMO_CONTATO = 11;   // K - Última Data de Contato
-
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ABA);
-  var dados = JSON.parse(e.postData.contents);
-
-  if (dados.action === "lead") {
-    registrarLead(sheet, dados);
-  } else if (dados.action === "resultado") {
-    registrarResultado(sheet, dados);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Perfil Comportamental — CEPGAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-fundo:    #0D2B1A;
+    --verde-escuro:   #1B5E20;
+    --verde-med:      #2E7D32;
+    --verde-vivo:     #4CAF50;
+    --verde-claro:    #C8E6C9;
+    --ouro:           #C9A84C;
+    --ouro-claro:     #F5E6C8;
+    --terra:          #5D4037;
+    --areia:          #F9F3E8;
+    --branco:         #FAFAFA;
+    --texto:          #1A1A1A;
+    --texto-suave:    #555;
   }
 
-  return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-function registrarLead(sheet, dados) {
-  var linha = sheet.getLastRow() + 1;
-  if (linha < LINHA_INICIO_DADOS) linha = LINHA_INICIO_DADOS;
-
-  var contato = (dados.telefone || "") + (dados.email ? " / " + dados.email : "");
-
-  sheet.getRange(linha, COL_NOME).setValue(dados.nome || "");
-  sheet.getRange(linha, COL_EMPRESA).setValue(dados.empresa || "");
-  sheet.getRange(linha, COL_CONTATO).setValue(contato);
-  sheet.getRange(linha, COL_ULTIMO_CONTATO).setValue(new Date());
-}
-
-function registrarResultado(sheet, dados) {
-  var linha = encontrarLinhaPorEmail(sheet, dados.email);
-
-  if (linha === -1) {
-    // Não achou o lead (ex: alguém abriu o diagnóstico direto, sem passar pelo formulário)
-    linha = sheet.getLastRow() + 1;
-    if (linha < LINHA_INICIO_DADOS) linha = LINHA_INICIO_DADOS;
-    sheet.getRange(linha, COL_NOME).setValue(dados.nome || "");
-    sheet.getRange(linha, COL_CONTATO).setValue(dados.email || "");
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--verde-fundo);
+    color: var(--texto);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  sheet.getRange(linha, COL_PERFIL).setValue(dados.perfil || "");
-  sheet.getRange(linha, COL_DIMENSAO).setValue(dados.dimensao || "");
-  sheet.getRange(linha, COL_DATA_DIAGNOSTICO).setValue(new Date());
-}
-
-function encontrarLinhaPorEmail(sheet, email) {
-  if (!email) return -1;
-  var ultimaLinha = sheet.getLastRow();
-  if (ultimaLinha < LINHA_INICIO_DADOS) return -1;
-
-  var valores = sheet.getRange(LINHA_INICIO_DADOS, COL_CONTATO, ultimaLinha - LINHA_INICIO_DADOS + 1, 1).getValues();
-  for (var i = 0; i < valores.length; i++) {
-    var contato = String(valores[i][0] || "");
-    if (contato.indexOf(email) !== -1) {
-      return LINHA_INICIO_DADOS + i;
-    }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(46,125,50,0.25) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(13,43,26,0.8) 0%, transparent 50%),
+      linear-gradient(170deg, #0D2B1A 0%, #1a3d26 40%, #0f2318 100%);
+    z-index: -1;
   }
-  return -1;
+
+  #tela-lead {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .logo-msustenta {
+    position: absolute;
+    top: 1.75rem;
+    right: 1.75rem;
+    width: 84px;
+    height: 84px;
+    opacity: 0.95;
+  }
+
+  @media (max-width: 480px) {
+    .logo-msustenta { width: 56px; height: 56px; top: 1rem; right: 1rem; }
+  }
+
+  .selo {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--ouro);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.85;
+  }
+
+  .titulo-principal {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 600;
+    color: var(--branco);
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitulo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ouro-claro);
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+  }
+
+  .divisor-ouro {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+    margin: 0 auto 2.5rem;
+  }
+
+  .intro-texto {
+    max-width: 560px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 2.5rem;
+  }
+
+  .card-lead {
+    width: 100%;
+    max-width: 460px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    backdrop-filter: blur(8px);
+    animation: entrar 0.4s ease;
+    text-align: left;
+  }
+
+  @keyframes entrar {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .campo { margin-bottom: 1.25rem; }
+
+  .campo label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ouro);
+    margin-bottom: 0.6rem;
+  }
+
+  .campo input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .campo input::placeholder { color: rgba(255,255,255,0.35); }
+
+  .campo input:focus {
+    outline: none;
+    background: rgba(76,175,80,0.1);
+    border-color: var(--verde-vivo);
+  }
+
+  .campo input.erro { border-color: #d9534f; }
+
+  .msg-erro {
+    display: none;
+    font-size: 0.78rem;
+    color: #e08a87;
+    margin-top: 0.4rem;
+  }
+
+  .btn-iniciar {
+    width: 100%;
+    background: linear-gradient(135deg, var(--verde-med), var(--verde-escuro));
+    color: #fff;
+    border: 1.5px solid var(--ouro);
+    border-radius: 50px;
+    padding: 1rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    margin-top: 0.5rem;
+  }
+
+  .btn-iniciar:hover {
+    background: linear-gradient(135deg, var(--verde-vivo), var(--verde-med));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(76,175,80,0.3);
+  }
+
+  .privacidade {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    margin-top: 1.25rem;
+    line-height: 1.6;
+  }
+
+  .rodape {
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.25);
+    margin-top: 3rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 480px) {
+    .card-lead { padding: 1.75rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<section id="tela-lead">
+  <img class="logo-msustenta" src="logo_msustenta.webp" alt="MSustentaMais">
+  <p class="selo">CEPGAS · Liderança Sustentável</p>
+  <h1 class="titulo-principal">Diagnóstico de<br>Perfil Comportamental</h1>
+  <p class="subtitulo">Descubra seu estilo de liderar a sustentabilidade</p>
+  <div class="divisor-ouro"></div>
+  <p class="intro-texto">
+    Preencha seus dados para iniciar o diagnóstico. Leva cerca de <strong style="color:#fff">5 minutos</strong> e ao final você recebe um perfil completo com seus pontos fortes e desafios como líder.
+  </p>
+
+  <form class="card-lead" id="form-lead" novalidate>
+    <div class="campo">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" name="nome" placeholder="Seu nome completo" autocomplete="name" required>
+      <p class="msg-erro" id="erro-nome">Informe seu nome.</p>
+    </div>
+
+    <div class="campo">
+      <label for="empresa">Empresa</label>
+      <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa" autocomplete="organization" required>
+      <p class="msg-erro" id="erro-empresa">Informe o nome da empresa.</p>
+    </div>
+
+    <div class="campo">
+      <label for="telefone">Telefone</label>
+      <input type="tel" id="telefone" name="telefone" placeholder="(65) 99999-9999" autocomplete="tel" required>
+      <p class="msg-erro" id="erro-telefone">Informe um telefone válido.</p>
+    </div>
+
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+      <p class="msg-erro" id="erro-email">Informe um e-mail válido.</p>
+    </div>
+
+    <button type="submit" class="btn-iniciar">Iniciar Diagnóstico</button>
+
+    <p class="privacidade">Seus dados são usados apenas para personalizar seu diagnóstico e contato do CEPGAS. Não fazemos spam.</p>
+  </form>
+
+  <p class="rodape">CEPGAS · Liderança Sustentável por Evidência · © Fernanda de Arruda Machado</p>
+</section>
+
+<script>
+const DIAGNOSTICO_URL = "https://msustentamais.github.io/CEPGAS/diagnostico_comportamental.html";
+
+const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzYO0yG0npNIQUs4qolFaNAIHDntWe8mt-c1sOrI8-JFob-FmqOJa91ztDr5UyEwZ_E/exec";
+
+function montarLinkWhatsApp(lead) {
+  const numero = "5565999055552";
+  const texto = "Novo lead do Diagnóstico CEPGAS:\n" +
+    "Nome: " + lead.nome + "\n" +
+    "Empresa: " + lead.empresa + "\n" +
+    "Telefone: " + lead.telefone + "\n" +
+    "E-mail: " + lead.email;
+  return "https://wa.me/" + numero + "?text=" + encodeURIComponent(texto);
 }
+
+function enviarParaPlanilha(lead) {
+  if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL.indexOf("COLE_AQUI") !== -1) return;
+  fetch(SHEETS_WEBHOOK_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(Object.assign({ action: "lead" }, lead))
+  }).catch(function () {});
+}
+
+function limparErros() {
+  document.querySelectorAll('.campo input').forEach(i => i.classList.remove('erro'));
+  document.querySelectorAll('.msg-erro').forEach(m => m.style.display = 'none');
+}
+
+function mostrarErro(idInput, idErro) {
+  document.getElementById(idInput).classList.add('erro');
+  document.getElementById(idErro).style.display = 'block';
+}
+
+document.getElementById('form-lead').addEventListener('submit', function (e) {
+  e.preventDefault();
+  limparErros();
+
+  const nome = document.getElementById('nome').value.trim();
+  const empresa = document.getElementById('empresa').value.trim();
+  const telefone = document.getElementById('telefone').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  let valido = true;
+
+  if (!nome) { mostrarErro('nome', 'erro-nome'); valido = false; }
+  if (!empresa) { mostrarErro('empresa', 'erro-empresa'); valido = false; }
+
+  const telLimpo = telefone.replace(/\D/g, '');
+  if (telLimpo.length < 10) { mostrarErro('telefone', 'erro-telefone'); valido = false; }
+
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailValido) { mostrarErro('email', 'erro-email'); valido = false; }
+
+  if (!valido) return;
+
+  const lead = { nome, empresa, telefone, email, data: new Date().toISOString() };
+  try { localStorage.setItem('cepgas_lead', JSON.stringify(lead)); } catch (err) {}
+
+  window.open(montarLinkWhatsApp(lead), '_blank');
+
+  enviarParaPlanilha(lead);
+
+  const params = new URLSearchParams({ nome, email });
+  window.location.href = DIAGNOSTICO_URL + '?' + params.toString();
+});
+</script>
+</body>
+</html>
