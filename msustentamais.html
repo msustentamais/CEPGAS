@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSustentaMais — Fernanda de Arruda Machado</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde-fundo:#0D2B1A; --verde-escuro:#1B5E20; --verde-med:#2E7D32; --verde-vivo:#4CAF50;
+  --verde-claro:#C8E6C9; --ouro:#C9A84C; --ouro-claro:#F5E6C8; --terra:#5D4037; --areia:#F9F3E8;
+  --branco:#FAFAFA; --texto:#1A1A1A; --texto-suave:#555;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--verde-fundo);color:var(--branco);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(46,125,50,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(13,43,26,0.8) 0%, transparent 50%),
+    linear-gradient(170deg, #0D2B1A 0%, #1a3d26 40%, #0f2318 100%);
+}
+h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--branco);}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 2rem;}
+section{padding:5rem 0;position:relative;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(13,43,26,0.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(201,168,76,0.18);}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 2rem;flex-wrap:wrap;gap:0.75rem;}
+.logo-nav{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--ouro);letter-spacing:0.05em;}
+.nav-links{display:flex;gap:1.4rem;flex-wrap:wrap;font-size:0.82rem;letter-spacing:0.04em;}
+.nav-links a{color:rgba(255,255,255,0.75);transition:color 0.2s;white-space:nowrap;}
+.nav-links a:hover{color:var(--ouro);}
+
+/* HERO */
+.hero{padding:6rem 0 4rem;text-align:center;}
+.selo{font-size:0.72rem;font-weight:600;letter-spacing:0.3em;color:var(--ouro);text-transform:uppercase;margin-bottom:1.5rem;opacity:0.9;}
+.hero h1{font-size:clamp(2.4rem,6vw,4rem);line-height:1.15;margin-bottom:1.2rem;}
+.hero h1 em{color:var(--ouro);font-style:normal;}
+.hero p.sub{max-width:640px;margin:0 auto 2.2rem;font-size:1.05rem;line-height:1.75;color:rgba(255,255,255,0.78);}
+.divisor{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--ouro),transparent);margin:0 auto 2.2rem;}
+.cta-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-block;padding:0.85rem 1.8rem;border-radius:50px;font-size:0.85rem;font-weight:600;
+  letter-spacing:0.06em;text-transform:uppercase;transition:all 0.25s;}
+.btn-primario{background:linear-gradient(135deg,var(--verde-med),var(--verde-escuro));color:#fff;border:1.5px solid var(--ouro);}
+.btn-primario:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,175,80,0.3);}
+.btn-secundario{border:1.5px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);}
+.btn-secundario:hover{border-color:var(--ouro);color:var(--ouro);}
+
+/* SECTION HEADER */
+.sec-tag{font-size:0.72rem;font-weight:600;letter-spacing:0.28em;color:var(--ouro);text-transform:uppercase;margin-bottom:0.8rem;}
+.sec-title{font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:1rem;}
+.sec-intro{max-width:680px;font-size:1rem;line-height:1.75;color:rgba(255,255,255,0.75);margin-bottom:2.5rem;}
+
+/* CARDS */
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;
+  padding:1.8rem;backdrop-filter:blur(6px);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+@media(max-width:760px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+.card h4{font-size:1.1rem;color:var(--ouro-claro);margin-bottom:0.5rem;font-weight:600;}
+.card p{font-size:0.92rem;line-height:1.65;color:rgba(255,255,255,0.72);}
+.icone{font-size:1.6rem;margin-bottom:0.7rem;display:block;}
+
+/* MISSAO VISAO */
+.mvp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-bottom:2.5rem;}
+@media(max-width:760px){.mvp-grid{grid-template-columns:1fr;}}
+.valores-row{display:flex;gap:0.9rem;flex-wrap:wrap;margin-top:1rem;}
+.valor-chip{border:1px solid var(--ouro);color:var(--ouro-claro);padding:0.5rem 1.1rem;border-radius:30px;font-size:0.82rem;letter-spacing:0.03em;}
+blockquote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;line-height:1.6;color:var(--ouro-claro);
+  border-left:2px solid var(--ouro);padding-left:1.3rem;margin-top:2rem;max-width:680px;}
+blockquote cite{display:block;margin-top:0.6rem;font-size:0.8rem;font-style:normal;color:rgba(255,255,255,0.5);letter-spacing:0.05em;}
+
+/* TIMELINE */
+.timeline{border-left:2px solid rgba(201,168,76,0.35);padding-left:1.6rem;display:flex;flex-direction:column;gap:1.4rem;}
+.tl-item{position:relative;}
+.tl-item::before{content:'';position:absolute;left:-1.85rem;top:0.35rem;width:9px;height:9px;border-radius:50%;background:var(--ouro);}
+.tl-item .ano{font-size:0.78rem;color:var(--ouro);font-weight:600;letter-spacing:0.05em;}
+.tl-item h4{font-size:1rem;color:#fff;margin:0.15rem 0;font-weight:600;}
+.tl-item p{font-size:0.86rem;color:rgba(255,255,255,0.62);}
+
+/* NUMEROS */
+.num-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;text-align:center;}
+@media(max-width:760px){.num-grid{grid-template-columns:repeat(2,1fr);}}
+.num-grid .num{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);color:var(--ouro);font-weight:600;}
+.num-grid .num-label{font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:0.3rem;line-height:1.4;}
+
+/* CEPGAS SIGLAS */
+.cha-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0.8rem;margin:2rem 0;}
+@media(max-width:760px){.cha-row{grid-template-columns:repeat(3,1fr);}}
+.cha-letra{text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:1rem 0.5rem;}
+.cha-letra .letra{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--ouro);font-weight:600;}
+.cha-letra .nome{font-size:0.72rem;color:rgba(255,255,255,0.65);margin-top:0.2rem;}
+
+/* EM CONSTRUCAO */
+.badge-construcao{display:inline-block;background:rgba(201,168,76,0.15);border:1px solid var(--ouro);color:var(--ouro-claro);
+  font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 0.9rem;border-radius:30px;margin-bottom:1.2rem;}
+
+/* PLACEHOLDER SECTIONS */
+.placeholder-box{border:1.5px dashed rgba(201,168,76,0.4);border-radius:18px;padding:2.5rem;text-align:center;color:rgba(255,255,255,0.6);
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.15rem;line-height:1.7;}
+
+/* FOOTER */
+footer{padding:4rem 0 3rem;text-align:center;border-top:1px solid rgba(255,255,255,0.08);margin-top:2rem;}
+.footer-social{display:flex;flex-direction:column;gap:0.9rem;align-items:center;margin:1.6rem 0;}
+.footer-social a{font-size:0.9rem;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);padding:0.6rem 1.6rem;
+  border-radius:30px;transition:all 0.2s;}
+.footer-social a:hover{border-color:var(--ouro);color:var(--ouro);}
+.footer-rodape{font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:2rem;letter-spacing:0.04em;}
+
+.alt-bg{background:rgba(255,255,255,0.02);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo-nav">MSustentaMais</div>
+    <div class="nav-links">
+      <a href="#quemsou">Quem Sou</a>
+      <a href="#cepgas">CEPGAS™</a>
+      <a href="#fazenda">A Fazenda</a>
+      <a href="#projetos">Projetos</a>
+      <a href="#turismo">Turismo Rural</a>
+      <a href="#producoes">Produções</a>
+      <a href="#contato">Contato</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="selo">MSustentaMais · Cáceres, Pantanal · Mato Grosso</p>
+    <h1>Onde a terra encontra <em>o legado.</em></h1>
+    <p class="sub">Educação ambiental, liderança ESG e sustentabilidade regenerativa — mais de 30 anos de trajetória entre a ciência, a arte e o Pantanal de Cáceres.</p>
+    <div class="divisor"></div>
+    <div class="cta-row">
+      <a class="btn btn-primario" href="#cepgas">Conhecer o CEPGAS™</a>
+      <a class="btn btn-secundario" href="https://wa.me/5565999055552?text=Ol%C3%A1%2C%20Fernanda!%20Vi%20o%20site%20da%20MSustentaMais." target="_blank">Falar no WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<!-- MISSAO VISAO PRINCIPIOS -->
+<section class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Quem Somos</p>
+    <h2 class="sec-title">Missão · Visão · Princípios</h2>
+    <div class="mvp-grid">
+      <div class="card">
+        <span class="icone">🌱</span>
+        <h4>Missão</h4>
+        <p>Promover a sustentabilidade por meio da educação, da liderança ética e da gestão regenerativa da terra — unindo ciência, arte e prática cotidiana.</p>
+      </div>
+      <div class="card">
+        <span class="icone">🔭</span>
+        <h4>Visão</h4>
+        <p>Ser referência em formação de lideranças ESG com maturidade atitudinal e em modelos de produção rural regenerativa que integrem turismo, cultura e sustentabilidade.</p>
+      </div>
+      <div class="card">
+        <span class="icone">🧭</span>
+        <h4>Princípios</h4>
+        <p>Fazer bem feito ou não fazer. Ajudar sem gerar dependência. Comunicação clara, direta e honesta. Amar sem perder a própria soberania.</p>
+      </div>
+    </div>
+    <div class="valores-row">
+      <span class="valor-chip">Liberdade</span>
+      <span class="valor-chip">Cuidado</span>
+      <span class="valor-chip">Responsabilidade</span>
+      <span class="valor-chip">Espiritualidade</span>
+      <span class="valor-chip">Justiça</span>
+    </div>
+    <blockquote>
+      "Somos sujeitos sociais, pertencentes, participativos e capazes de promover a sustentabilidade."
+      <cite>— Machado, 2026</cite>
+    </blockquote>
+  </div>
+</section>
+
+<!-- QUEM SOU -->
+<section id="quemsou">
+  <div class="wrap">
+    <p class="sec-tag">Quem Sou</p>
+    <h2 class="sec-title">Fernanda de Arruda Machado</h2>
+    <p class="sec-intro">Doutora em Educação Ambiental (Universidad de Santiago de Compostela, Espanha, 2011). Mestre em Educação (UFMT, 2006). Mais de 30 anos formando pessoas em educação ambiental, pedagogia e sustentabilidade — com pesquisas sobre percepção ambiental, cultura pantaneira e sustentabilidade florestal.</p>
+    <div class="grid-2">
+      <div class="card">
+        <span class="icone">🌍</span>
+        <h4>Educadora do Mundo</h4>
+        <p>Mais de 30 anos formando pessoas em educação ambiental, pedagogia e sustentabilidade, da sala de aula à consultoria.</p>
+      </div>
+      <div class="card">
+        <span class="icone">🔬</span>
+        <h4>Pensadora Sistêmica</h4>
+        <p>Mestra e Doutora com pesquisas sobre percepção ambiental, cultura pantaneira e sustentabilidade florestal.</p>
+      </div>
+      <div class="card">
+        <span class="icone">🌿</span>
+        <h4>Criadora de Metodologias</h4>
+        <p>Autora da metodologia CEPGAS™ para formação de líderes em ESG e do Programa Projetos EA.</p>
+      </div>
+      <div class="card">
+        <span class="icone">🏡</span>
+        <h4>Guardiã da Terra</h4>
+        <p>Gestora da Fazenda Santa Fé do Machadinho — laboratório vivo de sustentabilidade regenerativa no Pantanal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAJETORIA -->
+<section class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Trajetória</p>
+    <h2 class="sec-title">Mais de 30 anos de caminho</h2>
+    <p class="sec-intro">Da Pedagogia no Paraná ao Doutorado na Espanha, das salas de aula à gestão da própria terra — uma trajetória construída com raízes profundas no Pantanal.</p>
+    <div class="timeline">
+      <div class="tl-item"><span class="ano">1992</span><h4>Graduação em Pedagogia</h4><p>Universidade Estadual de Maringá · Paraná</p></div>
+      <div class="tl-item"><span class="ano">1994–1998</span><h4>Técnica Educacional · Supervisora e Coordenadora</h4><p>SESI Mato Grosso</p></div>
+      <div class="tl-item"><span class="ano">2001–2004</span><h4>Consultora em Turismo e Arranjo Produtivo Local</h4><p>SEBRAE Mato Grosso</p></div>
+      <div class="tl-item"><span class="ano">2003</span><h4>Especialização em Turismo, Desenvolvimento Local e Regional</h4><p>UNEMAT · Proposta de implantação do turismo na Fazenda Santa Fé do Machadinho</p></div>
+      <div class="tl-item"><span class="ano">2006</span><h4>Mestrado em Educação</h4><p>UFMT · Percepção das Águas Pantaneiras, bolsista CAPES</p></div>
+      <div class="tl-item"><span class="ano">2006–2012</span><h4>Professora de Graduação e Pós-Graduação</h4><p>Instituto Cuiabano de Educação (ICE)</p></div>
+      <div class="tl-item"><span class="ano">2011</span><h4>Doutorado em Educação Ambiental</h4><p>Universidad de Santiago de Compostela · Espanha — Sustentabilidade Florestal nas Perspectivas da EA, Cáceres-MT</p></div>
+      <div class="tl-item"><span class="ano">2012–2015</span><h4>Professora de Graduação, dedicação exclusiva</h4><p>Universidade de Cuiabá (UNIC)</p></div>
+      <div class="tl-item"><span class="ano">2013–2026</span><h4>Gestora</h4><p>Fazenda Santa Fé do Machadinho</p></div>
+      <div class="tl-item"><span class="ano">2018–2026</span><h4>Representante</h4><p>COMDER · Conselho Municipal de Desenvolvimento Rural, Cáceres-MT</p></div>
+      <div class="tl-item"><span class="ano">2025–2026</span><h4>Representante COMDEMA · Embaixadora Pecuária Tropical pelo Clima</h4><p>Conselho Municipal de Meio Ambiente · Projeto Vozes da Pecuária</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMEROS -->
+<section>
+  <div class="wrap">
+    <p class="sec-tag">Em Números</p>
+    <h2 class="sec-title">Uma trajetória mensurável</h2>
+    <div class="num-grid">
+      <div><div class="num">+30</div><div class="num-label">anos de atuação em educação e sustentabilidade</div></div>
+      <div><div class="num">4</div><div class="num-label">titulações acadêmicas — Pedagogia, Especializações, Mestrado, Doutorado</div></div>
+      <div><div class="num">+50</div><div class="num-label">produções científicas publicadas</div></div>
+      <div><div class="num">5</div><div class="num-label">países e instituições internacionais</div></div>
+      <div><div class="num">+100</div><div class="num-label">trabalhos orientados na graduação e pós-graduação</div></div>
+      <div><div class="num">2</div><div class="num-label">metodologias autorais — CEPGAS™ e Programa Projetos EA</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CEPGAS -->
+<section id="cepgas" class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Metodologia Autoral</p>
+    <h2 class="sec-title">CEPGAS™ — Liderança ESG com identidade real</h2>
+    <p class="sec-intro">Formação de líderes em ESG com identidade, propósito e autonomia real. 5 módulos · 15 encontros · Diagnósticos D0 a D5 · Perfil comportamental DISC.</p>
+    <div class="cha-row">
+      <div class="cha-letra"><div class="letra">C</div><div class="nome">Clareza</div></div>
+      <div class="cha-letra"><div class="letra">E</div><div class="nome">Estruturação</div></div>
+      <div class="cha-letra"><div class="letra">P</div><div class="nome">Parâmetros</div></div>
+      <div class="cha-letra"><div class="letra">G</div><div class="nome">Gestão de Impacto</div></div>
+      <div class="cha-letra"><div class="letra">A</div><div class="nome">Autoridade Real</div></div>
+      <div class="cha-letra"><div class="letra">S</div><div class="nome">Sustentabilidade por Evidência</div></div>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primario" href="https://msustentamais.github.io/CEPGAS/landing_cepgas.html" target="_blank">Conhecer o Método Completo</a>
+      <a class="btn btn-secundario" href="https://msustentamais.github.io/CEPGAS/lead_diagnostico.html" target="_blank">Fazer Diagnóstico Gratuito</a>
+      <a class="btn btn-secundario" href="https://msustentamais.github.io/CEPGAS/lead_guia.html" target="_blank">Receber o Guia PDF</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAZENDA -->
+<section id="fazenda">
+  <div class="wrap">
+    <p class="sec-tag">Vida & Território</p>
+    <h2 class="sec-title">Fazenda Santa Fé do Machadinho</h2>
+    <p class="sec-intro">Pantanal de Cáceres · Mato Grosso. A fazenda é extensão viva da minha ética: laboratório de sustentabilidade regenerativa onde gestão da terra, criação animal e educação ambiental coexistem como projeto de vida.</p>
+    <div class="grid-2">
+      <div class="card"><h4>Fazenda Pantaneira Sustentável</h4><p>Gestão regenerativa da terra e da criação animal, com práticas de manejo consciente do bioma pantaneiro.</p></div>
+      <div class="card"><h4>Programa e Projetos EA</h4><p>Educação ambiental aplicada, com décadas de atuação entre pesquisa e prática de campo.</p></div>
+      <div class="card"><h4>Turismo Rural no Pantanal</h4><p>Projeto de hospitalidade e vivência regenerativa — em fase de ressignificação (veja mais abaixo).</p></div>
+      <div class="card"><h4>Restauração de Casas Históricas</h4><p>Preservação do patrimônio arquitetônico pantaneiro de Cáceres-MT.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJETOS -->
+<section id="projetos" class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Atuação Institucional</p>
+    <h2 class="sec-title">Projetos & Pesquisas</h2>
+    <div class="grid-2">
+      <div class="card"><h4>Restauração de Casas Históricas — Cáceres MT</h4><p>Frente do Programa Projetos EA que integra memória, identidade territorial e sustentabilidade regenerativa: preservação do patrimônio, educação patrimonial, turismo cultural e recuperação de espaços históricos para a comunidade.</p></div>
+      <div class="card"><h4>PELD — Educação Ambiental no Pantanal</h4><p>2002–2005 · SESC, coordenação M. T. Sato. Integrante da equipe de pesquisa.</p></div>
+      <div class="card"><h4>Filtro Pedagógico no Pantanal</h4><p>2004–2006 · FAPEMAT, coordenação M. T. Sato.</p></div>
+      <div class="card"><h4>Reinventando Caminhos Iconográficos</h4><p>2004–2006 · FAPEMAT/UFMT. Leitura de imagens e cultura visual das comunidades de Mimoso e Joselândia.</p></div>
+      <div class="card"><h4>COMDER & COMDEMA</h4><p>Representante nos Conselhos Municipais de Desenvolvimento Rural e de Meio Ambiente de Cáceres-MT (2018–2026).</p></div>
+      <div class="card"><h4>Vozes da Pecuária</h4><p>Embaixadora Pecuária Tropical pelo Clima (2025–2026).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TURISMO RURAL -->
+<section id="turismo">
+  <div class="wrap">
+    <span class="badge-construcao">Em construção · ressignificação</span>
+    <p class="sec-tag">Turismo Rural</p>
+    <h2 class="sec-title">Um projeto em transformação</h2>
+    <p class="sec-intro">O turismo rural na Fazenda Santa Fé do Machadinho está em fase de ressignificação e construção — unindo hospitalidade, paisagem pantaneira e vivência regenerativa. A proposta nasceu ainda em 2003, na especialização em Turismo, e segue amadurecendo junto com a fazenda.</p>
+    <div class="placeholder-box">Novidades sobre o Turismo Rural em breve, à medida que o projeto for se definindo.</div>
+  </div>
+</section>
+
+<!-- PRODUCOES -->
+<section id="producoes" class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Produções Culturais & Artísticas</p>
+    <h2 class="sec-title">Onde a ciência encontra a arte</h2>
+    <p class="sec-intro">Onde a ciência encontra a arte, a memória e o território. Mais de 50 produções científicas catalogadas no Lattes.</p>
+    <div class="grid-2">
+      <div class="card"><h4>📚 Livros & Material Didático</h4><p>Co-autora de 4 cadernos do Projeto de EA (PrEA/UFMT): Múltiplas Dimensões da Educação Ambiental (2004), Conceitos em Educação Ambiental (2004), Cadernos 3 e 4 do PrEA.</p></div>
+      <div class="card"><h4>✍️ Coluna Cultural Impressa</h4><p>Colunista da Revista Portal e do Correio Cacerense (2003–2005). Artigos sobre identidade pantaneira, turismo sustentável e cidadania ambiental.</p></div>
+      <div class="card"><h4>🎬 Produção Audiovisual</h4><p>Co-produção do vídeo "Pesquisa da Pesquisa: um olhar fenomenológico" (UFMT, 2004), traduzindo a percepção ambiental das comunidades pantaneiras em linguagem audiovisual.</p></div>
+      <div class="card"><h4>🖼️ Iconografia & Arte Ambiental</h4><p>Projeto Reinventando Caminhos Iconográficos — leitura de imagens e cultura visual das comunidades de Mimoso e Joselândia.</p></div>
+    </div>
+    <h3 style="margin-top:2.5rem;font-size:1.3rem;color:var(--ouro-claro);">Publicações de destaque</h3>
+    <div class="timeline" style="margin-top:1.2rem;">
+      <div class="tl-item"><span class="ano">2017</span><h4>Educação Ambiental: Campo de Saberes e Práticas para Pedagogia Social e Sustentabilidade Florestal</h4><p>Com J. A. C. Gómez · SEMIEDU/UFMT</p></div>
+      <div class="tl-item"><span class="ano">2017</span><h4>A Sustentabilidade na Perspectiva Fenomenológica de Merleau-Ponty</h4><p>Com J. A. C. Gómez</p></div>
+      <div class="tl-item"><span class="ano">2014</span><h4>Ruação — nos sentidos merleaupontyanos dos cuidadores</h4><p>Com I. C. L. Assumpção · Editora UFMT</p></div>
+      <div class="tl-item"><span class="ano">2014</span><h4>Leitura das Águas Pantaneiras</h4><p>Educação Ambiental nas Instituições, Cáceres-MT</p></div>
+      <div class="tl-item"><span class="ano">2004</span><h4>Múltiplas Dimensões da Educação Ambiental</h4><p>Org. com M. T. Sato et al. · Tanta Tinta, Cuiabá</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTRAS ATUACOES / EXERCICIOS -->
+<section id="exercicios">
+  <div class="wrap">
+    <p class="sec-tag">Exercícios de Mim</p>
+    <h2 class="sec-title">Outras atuações & boas práticas</h2>
+    <p class="sec-intro">Expressões que também são minhas práticas de cuidado e presença — onde a arte sustenta a mesma ética que a fazenda e a educação.</p>
+    <div class="grid-3">
+      <div class="card"><span class="icone">🗿</span><h4>Esculturas</h4><p>Trabalho manual como forma de meditação e presença.</p></div>
+      <div class="card"><span class="icone">🎨</span><h4>Pintura</h4><p>Registro sensível da paisagem e da vida pantaneira.</p></div>
+      <div class="card"><span class="icone">📷</span><h4>Fotografia</h4><p>O olhar treinado nas décadas de pesquisa sobre percepção ambiental.</p></div>
+      <div class="card"><span class="icone">🧵</span><h4>Artesã</h4><p>Produção manual como extensão do cuidado com a terra.</p></div>
+      <div class="card"><span class="icone">🏞️</span><h4>Gestora IGR Pantanal</h4><p>Atuação em turismo sustentável regional.</p></div>
+      <div class="card"><span class="icone">🐄</span><h4>Produção e execução de projetos</h4><p>Gestão prática da fazenda e de seus programas.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- POESIAS -->
+<section id="poesias" class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Palavra & Poesia</p>
+    <h2 class="sec-title">Poesias</h2>
+    <div class="placeholder-box">Espaço reservado para os textos e poesias da Fernanda. Em breve, os primeiros versos.</div>
+  </div>
+</section>
+
+<!-- BANCO DE IDEIAS -->
+<section id="ideias">
+  <div class="wrap">
+    <p class="sec-tag">Rascunhos & Sementes</p>
+    <h2 class="sec-title">Banco de Ideias</h2>
+    <div class="placeholder-box">Um caco de ideias — rascunhos, insights e sementes de projetos futuros, registrados aqui à medida que nascem.</div>
+  </div>
+</section>
+
+<!-- DINAMICAS -->
+<section id="dinamicas" class="alt-bg">
+  <div class="wrap">
+    <p class="sec-tag">Vivências Práticas</p>
+    <h2 class="sec-title">Dinâmicas</h2>
+    <div class="placeholder-box">Espaço para as dinâmicas e vivências práticas usadas nos encontros e formações — em construção.</div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<footer id="contato">
+  <div class="wrap">
+    <p class="sec-tag" style="text-align:center;">Vamos conversar</p>
+    <h2 class="sec-title" style="text-align:center;">Fernanda de Arruda Machado</h2>
+    <p style="text-align:center;color:rgba(255,255,255,0.6);font-size:0.95rem;">Cáceres · Mato Grosso · Brasil</p>
+    <div class="footer-social">
+      <a href="https://wa.me/5565999055552" target="_blank">WhatsApp · (65) 99905-5552</a>
+      <a href="#" target="_blank">Instagram</a>
+      <a href="#" target="_blank">YouTube</a>
+    </div>
+    <p class="footer-rodape">MSustentaMais · CEPGAS™ · Liderança Sustentável por Evidência · © Fernanda de Arruda Machado</p>
+  </div>
+</footer>
+
+</body>
+</html>
