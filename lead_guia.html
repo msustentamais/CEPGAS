@@ -277,12 +277,19 @@ return "https://wa.me/" + numero + "?text=" + encodeURIComponent(texto);
 
 function enviarParaPlanilha(lead) {
 if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL.indexOf("COLE_AQUI") !== -1) return;
+var payload = JSON.stringify(Object.assign({ action: "lead" }, lead));
+if (navigator.sendBeacon) {
+var blob = new Blob([payload], { type: "text/plain;charset=UTF-8" });
+navigator.sendBeacon(SHEETS_WEBHOOK_URL, blob);
+} else {
 fetch(SHEETS_WEBHOOK_URL, {
 method: "POST",
 mode: "no-cors",
+keepalive: true,
 headers: { "Content-Type": "text/plain;charset=utf-8" },
-body: JSON.stringify(Object.assign({ action: "lead" }, lead))
+body: payload
 }).catch(function () {});
+}
 }
 
 function limparErros() {
