@@ -508,7 +508,46 @@
 // ══════════════════════════════════════════
 // Link da agenda on-line. Cole o endereço entre as aspas para o botão "Agendar" aparecer.
 const AGENDA_LINK = "https://calendar.app.google/T2kggyigpdkjYfoA9";
-const WHATSAPP_LINK = "https://wa.me/5565999055552?text=" + encodeURIComponent("Olá, Fernanda! Acabei de fazer o Diagnóstico de Perfil Comportamental do CEPGAS. Gostaria de saber mais sobre o programa.");
+const WHATSAPP_NUMERO = "5565999055552";
+const WHATSAPP_LINK = "https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent("Olá, Fernanda! Acabei de fazer o Diagnóstico de Perfil Comportamental do CEPGAS. Gostaria de saber mais sobre o programa.");
+
+// Cada resultado é enviado por e-mail para Fernanda (serviço FormSubmit — gratuito, sem cadastro)
+const EMAIL_AVISO_URL = "https://formsubmit.co/ajax/msustentamais@gmail.com";
+
+// Dados de quem preencheu o cadastro (lead_diagnostico.html)
+function lerLead() {
+  let lead = {};
+  try { lead = JSON.parse(localStorage.getItem('cepgas_lead') || '{}') || {}; } catch (e) { lead = {}; }
+  const params = new URLSearchParams(window.location.search);
+  ['nome', 'email', 'telefone', 'empresa'].forEach(c => { if (params.get(c)) lead[c] = params.get(c); });
+  return lead;
+}
+
+function enviarResultado(dados) {
+  if (!EMAIL_AVISO_URL) return;
+  const tel = String(dados.telefone || "").replace(/\D/g, "");
+  const corpo = {
+    _subject: "Novo diagnóstico CEPGAS: " + (dados.nome || "pessoa sem cadastro") + " — " + dados.perfil,
+    _template: "table",
+    _captcha: "false",
+    "Nome": dados.nome || "-",
+    "Empresa": dados.empresa || "-",
+    "Telefone": dados.telefone || "-",
+    "E-mail": dados.email || "-",
+    "Tipo de liderança": dados.perfil,
+    "Dimensão": dados.dimensao,
+    "Principais desafios": dados.desafios,
+    "Respostas por letra": dados.contagem,
+    "Chamar no WhatsApp": tel.length >= 10 ? "https://wa.me/55" + tel : "-"
+  };
+  if (dados.email) corpo._replyto = dados.email;
+  fetch(EMAIL_AVISO_URL, {
+    method: "POST",
+    keepalive: true,
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify(corpo)
+  }).catch(function () {});
+}
 
 const perguntas = [
   {
@@ -794,8 +833,24 @@ function mostrarResultado() {
     chaWrap.appendChild(div);
   });
 
-  // botão WhatsApp
-  document.getElementById('btn-zap').href = WHATSAPP_LINK;
+  // envia o resultado para a planilha (e o e-mail de aviso para Fernanda)
+  const lead = lerLead();
+  const tituloPerfil = `Perfil ${perfil} — ${d.nome}`;
+  enviarResultado({
+    nome: lead.nome || "",
+    email: lead.email || "",
+    telefone: lead.telefone || "",
+    empresa: lead.empresa || "",
+    perfil: tituloPerfil,
+    dimensao: d.subtitulo,
+    desafios: d.desafios.join("; "),
+    contagem: `A=${contagem.A}, B=${contagem.B}, C=${contagem.C}, D=${contagem.D}`
+  });
+
+  // botão WhatsApp — a mensagem já leva o nome e o perfil
+  const msgZap = "Olá, Fernanda! " + (lead.nome ? "Sou " + lead.nome + (lead.empresa ? ", da " + lead.empresa : "") + ". " : "") +
+    "Acabei de fazer o Diagnóstico do CEPGAS e meu resultado foi " + tituloPerfil + " (" + d.subtitulo + "). Gostaria de conversar sobre o programa.";
+  document.getElementById('btn-zap').href = "https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent(msgZap);
   if (AGENDA_LINK) { const ag = document.getElementById('btn-agenda'); ag.href = AGENDA_LINK; ag.style.display = ''; }
 }
 

@@ -261,7 +261,7 @@ Preencha seus dados para iniciar o diagnóstico. Leva cerca de <strong style="co
 </section>
 
 <script>
-const DIAGNOSTICO_URL = "https://msustentamais.github.io/CEPGAS/diagnostico_comportamental.html";
+const DIAGNOSTICO_URL = "diagnostico_comportamental.html";
 
 const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzYO0yG0npNIQUs4qolFaNAIHDntWe8mt-c1sOrI8-JFob-FmqOJa91ztDr5UyEwZ_E/exec";
 
@@ -331,7 +331,7 @@ window.open(montarLinkWhatsApp(lead), '_blank');
 
 enviarParaPlanilha(lead);
 
-const params = new URLSearchParams({ nome, email });
+const params = new URLSearchParams({ nome, email, telefone, empresa });
 window.location.href = DIAGNOSTICO_URL + '?' + params.toString();
 });
 </script>
