@@ -523,11 +523,19 @@ function lerLead() {
   return lead;
 }
 
+// Sem cadastro (nome, empresa, telefone e e-mail), a pessoa vai primeiro para o formulário
+(function exigirCadastro() {
+  const l = lerLead();
+  if (!l.nome || !l.email || !l.telefone) {
+    window.location.replace("lead_diagnostico.html");
+  }
+})();
+
 function enviarResultado(dados) {
   if (!EMAIL_AVISO_URL) return;
   const tel = String(dados.telefone || "").replace(/\D/g, "");
   const corpo = {
-    _subject: "Novo diagnóstico CEPGAS: " + (dados.nome || "pessoa sem cadastro") + " — " + dados.perfil,
+    _subject: "Agendamento CEPGAS: " + (dados.nome || "pessoa sem cadastro") + " — " + dados.perfil,
     _template: "table",
     _captcha: "false",
     "Nome": dados.nome || "-",
@@ -749,6 +757,15 @@ const perfis = {
 // ══════════════════════════════════════════
 // ESTADO
 // ══════════════════════════════════════════
+let resultadoAtual = null;
+let resultadoEnviado = false;
+// O perfil só é enviado para Fernanda quando a pessoa clica em "Agendar uma conversa"
+document.addEventListener('DOMContentLoaded', function () {
+  const ag = document.getElementById('btn-agenda');
+  if (ag) ag.addEventListener('click', function () {
+    if (resultadoAtual && !resultadoEnviado) { enviarResultado(resultadoAtual); resultadoEnviado = true; }
+  });
+});
 let atual = 0;
 let contagem = { A: 0, B: 0, C: 0, D: 0 };
 
@@ -836,7 +853,7 @@ function mostrarResultado() {
   // envia o resultado para a planilha (e o e-mail de aviso para Fernanda)
   const lead = lerLead();
   const tituloPerfil = `Perfil ${perfil} — ${d.nome}`;
-  enviarResultado({
+  resultadoAtual = ({
     nome: lead.nome || "",
     email: lead.email || "",
     telefone: lead.telefone || "",
@@ -852,6 +869,7 @@ function mostrarResultado() {
     "Acabei de fazer o Diagnóstico do CEPGAS e meu resultado foi " + tituloPerfil + " (" + d.subtitulo + "). Gostaria de conversar sobre o programa.";
   document.getElementById('btn-zap').href = "https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent(msgZap);
   if (AGENDA_LINK) { const ag = document.getElementById('btn-agenda'); ag.href = AGENDA_LINK; ag.style.display = ''; }
+  resultadoEnviado = false;
 }
 
 function reiniciar() {

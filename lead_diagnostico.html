@@ -327,7 +327,6 @@ if (!valido) return;
 const lead = { nome, empresa, telefone, email, data: new Date().toISOString() };
 try { localStorage.setItem('cepgas_lead', JSON.stringify(lead)); } catch (err) {}
 
-window.open(montarLinkWhatsApp(lead), '_blank');
 
 enviarParaPlanilha(lead);
 
